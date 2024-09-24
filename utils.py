@@ -884,11 +884,7 @@ def read_txt_file_wth_qnttive_metrics(file_path):
         for i, line in enumerate(f):
             idx_equal, idx_jump = find_element_start_end(line=line)
             if idx_equal != None and idx_jump != None:
-                metrics_dict[line[:idx_equal]] = json.loads(
-                    json.dumps(line[idx_equal + 1 : idx_jump])
-                )
+                metrics_dict[line[:idx_equal]] = eval(line[idx_equal + 1 : idx_jump])
             elif idx_equal != None and idx_jump == None:
-                metrics_dict[line[:idx_equal]] = json.loads(
-                    json.dumps(line[idx_equal + 1 :])
-                )
+                metrics_dict[line[:idx_equal]] = eval(line[idx_equal + 1 :])
     return metrics_dict

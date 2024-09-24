@@ -1,5 +1,6 @@
 import numpy as np
-from utils import give_idx_ppm_point_for_different_ppm_arrays, get_metrics
+from utils import give_idx_ppm_point_for_different_ppm_arrays, give_idx_time_point_for_different_time_arrays, get_metrics
+
 
 def spect_noise_estimation(list_spects,list_ppm_arrays,list_ppm_regions,part,degree):
   """
@@ -24,6 +25,8 @@ def spect_noise_estimation(list_spects,list_ppm_arrays,list_ppm_regions,part,deg
     elif reg[0] > reg[1]:
       smaller_value = reg[1]
       higher_value = reg[0]
+
+  
     idx_start = give_idx_ppm_point_for_different_ppm_arrays(list_ppm_arrays=list_ppm_arrays,ppm_point=smaller_value)
     idx_end = give_idx_ppm_point_for_different_ppm_arrays(list_ppm_arrays=list_ppm_arrays,ppm_point=higher_value)
     std_measures[str(smaller_value)+':'+str(higher_value)] = {'mean':[],'std':[], 'avg_coefs':[]}
