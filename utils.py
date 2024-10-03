@@ -870,6 +870,26 @@ def find_element_start_end(line):
             break
     return idx_equal, idx_jump
 
+def check_for_nan_in_line(line):
+    """
+    Check for nans and replace them with a very large number.
+    """
+    there_is_nan = False
+    nan_idx = []
+    list_line = list(line)
+    str_line=''
+    for i in range((len(list_line)-3)):
+        if list_line[i:i+3] == ['N','a','N']:
+            there_is_nan = True
+            nan_idx.append(i)
+    if there_is_nan == True:
+        for i in range(len(nan_idx)):
+            list_line[nan_idx[i]] = '1.222e'
+            list_line[nan_idx[i]+1] = '+'
+            list_line[nan_idx[i]+2] = '34'
+        str_line = ''.join(list_line)
+    return there_is_nan, str_line
+
 
 def read_txt_file_wth_qnttive_metrics(file_path):
     """
@@ -884,7 +904,17 @@ def read_txt_file_wth_qnttive_metrics(file_path):
         for i, line in enumerate(f):
             idx_equal, idx_jump = find_element_start_end(line=line)
             if idx_equal != None and idx_jump != None:
-                metrics_dict[line[:idx_equal]] = eval(line[idx_equal + 1 : idx_jump])
+                there_is_nan, line_aux = check_for_nan_in_line(line[idx_equal + 1 : idx_jump])
+                if there_is_nan == True:
+                    print('In metric: '+line[:idx_equal]+' there was nan values, they were replaced by 1.222e+34')
+                    metrics_dict[line[:idx_equal]] = eval(line_aux)
+                else:
+                    metrics_dict[line[:idx_equal]] = eval(line[idx_equal + 1 : idx_jump])
             elif idx_equal != None and idx_jump == None:
-                metrics_dict[line[:idx_equal]] = eval(line[idx_equal + 1 :])
+                there_is_nan, nan_idx = check_for_nan_in_line(line[idx_equal + 1 :])
+                if there_is_nan == True:
+                    print('In metric: '+line[:idx_equal]+' there was nan values, they were replaced by 1.222e+34')
+                    metrics_dict[line[:idx_equal]] = eval(line_aux)
+                else:
+                    metrics_dict[line[:idx_equal]] = eval(line[idx_equal + 1 :])
     return metrics_dict
