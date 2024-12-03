@@ -5,7 +5,7 @@ from data_corruption import TransientMaker
 from scipy.signal import ShortTimeFFT
 
 
-def create_corrupted_fids(gt, t, std_base, std_var, ntransients):
+def create_corrupted_fids(gt, t, std_base, std_var, ntransients=160):
     """
     Create ntransients from the gt FIDs, adding amplitude noise
     Inputs:
@@ -20,7 +20,7 @@ def create_corrupted_fids(gt, t, std_base, std_var, ntransients):
     Outputs:
     corrupted_fids: np array (N,T,2,ntransients)
     """
-    tm = TransientMaker(fids=gt, t=t, transients=160)
+    tm = TransientMaker(fids=gt, t=t, transients=ntransients)
     tm.add_random_amplitude_noise(
         noise_level_base=std_base, noise_level_scan_var=std_var
     )
