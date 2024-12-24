@@ -1,5 +1,5 @@
 import numpy as np
-from utils import give_idx_ppm_point_for_different_ppm_arrays, give_idx_time_point_for_different_time_arrays, get_metrics
+from utils import give_idx_ppm_point_for_different_ppm_arrays, give_idx_time_point_for_different_time_arrays, get_metrics, give_idx_ppm_point, give_idx_time_point
 
 
 def spect_noise_estimation(list_spects,list_ppm_arrays,list_ppm_regions,part,degree):
@@ -135,4 +135,52 @@ def stats_per_masked_regions_for_different_spgrams(masks,spgram_dict, part):
             stats_per_region[list(stats_per_region.keys())[j]][str(k)]['std'].append(stats_per_region_aux[list(stats_per_region.keys())[j]][str(k)]['std'])
     
     return stats_per_region
+
+
+def spgram_noise_estimation(spgram_dict,list_ppm_regions,part):
+  """
+  Get average std deviation for different spectrograms. Measured in the image domain.
+  Inputs:
+  spgram_dict: dict of lists, dict with keys 'param_x'.
+                 For each key there is a list of 4 objects: [spectrogram of size (N,f,t), frequency array of size (f,), ppm array of size (f,), time array of size (t,)]
+  list_ppm_regions: list of lists, every list within list_ppm_regions should have 2 values, the starting ppm point and the ending ppm point of that region (allows estimation of noise level in multiple regions)
+  part: str, if 'imag' -> consider imaginary part of image, 'abs' -> consider absolute part of image
+                'phase' -> consider phase of image, else consider real part
+  Output:
+  std_measures: dict of lists, std_measures['ppm1:ppm2'] gives a list with the average std level measured to each spgram in spgram_dict at the region defined by ppm points : ppm1 and ppm2 (one of the lists in list_ppm_regions),
+                also gives the std of the mean
+  """
+  std_measures = {}
+  for reg in list_ppm_regions:
+
+    if reg[0] <= reg[1]:
+      smaller_value = reg[0]
+      higher_value = reg[1]
+    elif reg[0] > reg[1]:
+      smaller_value = reg[1]
+      higher_value = reg[0]
+    std_measures[str(smaller_value)+':'+str(higher_value)] = {'mean':[],'std':[]}
+        
+    for key in list(spgram_dict.keys()):
+        
+      idx_start = give_idx_ppm_point(ppm_array=spgram_dict[key][2],ppm_point=smaller_value)
+      idx_end = give_idx_ppm_point(ppm_array=spgram_dict[key][2],ppm_point=higher_value)
+      idx_time_0d6 = give_idx_time_point(time_array=spgram_dict[key][-1],time_point=0.6)
+      
+      if part == 'abs':
+        obj = np.abs(spgram_dict[key][0])
+      elif part == 'phase':
+        obj = np.angle(spgram_dict[key][0],False)
+      elif part == 'imag':
+        obj = np.imag(spgram_dict[key][0])
+      else:
+        obj = np.real(spgram_dict[key][0])
+
+      aux = []
+      for q in range(spgram_dict[key][0].shape[0]):
+        aux.append(np.std(obj[q,idx_start:idx_end,idx_time_0d6:] - np.mean(obj[q,idx_start:idx_end,idx_time_0d6:])))
+      std_measures[str(smaller_value)+':'+str(higher_value)]['mean'].append(np.mean(np.array(aux)))
+      std_measures[str(smaller_value)+':'+str(higher_value)]['std'].append(np.std(np.array(aux)))
+
+  return std_measures
 
