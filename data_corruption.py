@@ -1,3 +1,6 @@
+#Script from: Edited-MRS-challenge official github (https://github.com/rmsouza01/Edited-MRS-challenge)
+#credits: rodrigopberto | rmsouza01
+
 import numpy as np
 import math
 
