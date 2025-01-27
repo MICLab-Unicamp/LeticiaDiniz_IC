@@ -1,0 +1,37 @@
+fids:
+  qntty: 100
+  path_to_gt_fids: '../sample_data.h5'
+
+name_of_study: 'hop_study_test_no_noise'
+
+amplitude_noise:
+  add_noise: False
+  noise_config:
+    std_base: 6
+    std_var: 2
+    nmb_of_transients_to_combine: 160
+
+study_parameters:
+  param_to_vary: 'hop'
+  variation_details:
+      min: 2
+      max: 128
+      step: 2
+  fixed_params:
+      'mfft': 512
+      'win': 'hann'
+      'norm': 'abs'
+
+save_pictures_along_the_way: True
+
+stats_analysis:
+  perform_stats_analysis: True
+  segmentation_values:
+    - 0.001
+    - 0.02
+    - 0.08
+    - 0.2
+    - 0.6
+  save_pictures: True
+
+

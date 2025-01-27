@@ -345,7 +345,7 @@ def qntty_per_region_histogram(regions, hist, centered_bins):
 
     return qntty_per_regions
 
-def histogram_for_different_spgram_and_qntty_per_histogram_region(spgram_dict,nbins,part,regions,normalized):
+def histogram_for_different_spgram_and_qntty_per_histogram_region(spgram_dict,nbins,part,regions,normalized, not_zero_centered=None, center_value=None):
     """
     Get the mean histogram for different images. Get also the qntties of pixels for different regions of the histograms.
     Inputs:
@@ -357,6 +357,8 @@ def histogram_for_different_spgram_and_qntty_per_histogram_region(spgram_dict,nb
     regions: list with POSITIVE floats, let regions = [x, y, z] we will get the qntty of pixels in regions :x, x:y, y:z, z:.
              assumes the values are ordered
     normalized: bool, if True, histograms are normalized by the total number of samples, and instead of qntties of pixels, we get %
+    not_zero_centered, center_value (optional): if not_zero_centered is True than subtracts center_value of 
+                    the spgram before considering the thresholds (thresholds are assumed to consider a center valued spgram)
     Check description of qntty_per_region_histogram for details.
     Outputs:
     hist: list with mean histograms for the spgrams obtained with different parameters. More explicitly: we get the hist for N arrays of size (f,t) obtained
@@ -379,7 +381,10 @@ def histogram_for_different_spgram_and_qntty_per_histogram_region(spgram_dict,nb
             qntty_per_regions[str(regions[k-1])+':'+str(regions[k])] = {'mean':[],'std':[]}
 
     for i in range(len(list(spgram_dict.keys()))):
-        hist_aux, bins_aux, bins_centered_aux = get_histogram(spgram=spgram_dict[list(spgram_dict.keys())[i]][0],part=part,nbins=nbins,flatten=False,normalized=normalized)
+        if not_zero_centered == True and center_value != None:
+            hist_aux, bins_aux, bins_centered_aux = get_histogram(spgram=spgram_dict[list(spgram_dict.keys())[i]][0]-center_value,part=part,nbins=nbins,flatten=False,normalized=normalized)
+        else:
+            hist_aux, bins_aux, bins_centered_aux = get_histogram(spgram=spgram_dict[list(spgram_dict.keys())[i]][0],part=part,nbins=nbins,flatten=False,normalized=normalized)
         hist.append(np.mean(hist_aux,axis = 0))
         bins.append(np.mean(bins_aux,axis = 0))
         bins_centered.append(np.mean(bins_centered_aux,axis = 0))

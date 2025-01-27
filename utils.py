@@ -3,7 +3,7 @@ import json
 import numpy as np
 from data_corruption import TransientMaker
 from scipy.signal import ShortTimeFFT
-
+import yaml
 
 def create_corrupted_fids(gt, t, std_base, std_var, ntransients=160):
     """
@@ -918,3 +918,12 @@ def read_txt_file_wth_qnttive_metrics(file_path):
                 else:
                     metrics_dict[line[:idx_equal]] = eval(line[idx_equal + 1 :])
     return metrics_dict
+
+
+def read_yaml(file: str) -> yaml.loader.FullLoader:
+    # credits: Gabriel Dias (g172441@dac.unicamp.br), Mateus Oliveira (m203656@dac.unicamp.br)
+    # from Github repo: https://github.com/MICLab-Unicamp/Spectro-ViT
+    with open(file, "r") as yaml_file:
+        configurations = yaml.load(yaml_file, Loader=yaml.FullLoader)
+
+    return configurations
