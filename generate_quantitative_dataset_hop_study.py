@@ -296,6 +296,7 @@ if save_pictures_along_the_way == True:
     plt.close()
 
     ##--------------------ZCR AND PEAKS PROFILES---------------------------------------
+    print("Save ZCR figure...")
     fig = plt.figure(figsize=(16, 10))
     gs = GridSpec(2, 3, height_ratios=[1, 1])
     ax1 = fig.add_subplot(gs[0, 0])  
@@ -349,7 +350,7 @@ if save_pictures_along_the_way == True:
 if perform_stats_analysis == True:
     print('Calculating statistical characteristics...')
 
-    ##--------------------REGIONS MAXIMUNS--------------------------------------------
+    ##--------------------REGIONS MAXIMUM---------------------------------------------
     print('Calculating maximum absolute value for different ppm regions...')
     sections = [-4,-3,-2,-1,0,1,1.50,2.50,3.50,4,5,6,7,8.50,9,10]
     idx_time_list_sup = []
@@ -369,7 +370,7 @@ if perform_stats_analysis == True:
     std_sec['residual'] = std_sec_aux['1:4']
 
     if save_pictures_stats == True:
-        ##-------------------- FIGURE OF REGIONS MAXIMUNS---------------------------
+        ##-------------------- FIGURE OF REGIONS MAXIMUM----------------------------
         fig,ax = plt.subplots(2,3,figsize=(16,8))
         sections = [-4,-3,-2,-1,0,1,1.50,2.50,3.50,4,5,6,7,8.50,9,10]
 
@@ -416,17 +417,19 @@ if perform_stats_analysis == True:
             for idx_seg in range(len(segmentation_values)+1):
                 if idx_seg == 0:
                     seg_res = (np.abs(np.real(spgram_hop['hop_'+str(hop_[plot_id[idx]])][0][0,:,:])) < segmentation_values[idx_seg]).astype('int')
-                    ax.flat[6*idx+idx_seg].set_title('hop ='+str(hop_[plot_id[idx]])+'\n |Spgram| < '+str(segmentation_values[idx_seg]))
+                    ax.flat[(len(segmentation_values)+1)*idx+idx_seg].set_title('hop ='+str(hop_[plot_id[idx]])+'\n |Spgram| < '+str(segmentation_values[idx_seg]))
                 elif idx_seg == len(segmentation_values):
                     seg_res = (np.abs(np.real(spgram_hop['hop_'+str(hop_[plot_id[idx]])][0][0,:,:])) > segmentation_values[idx_seg-1]).astype('int')
-                    ax.flat[6*idx+idx_seg].set_title('hop ='+str(hop_[plot_id[idx]])+'\n |Spgram| > '+str(segmentation_values[idx_seg-1]))
+                    ax.flat[(len(segmentation_values)+1)*idx+idx_seg].set_title('hop ='+str(hop_[plot_id[idx]])+'\n |Spgram| > '+str(segmentation_values[idx_seg-1]))
                 else:
                     seg_res = (np.abs(np.real(spgram_hop['hop_'+str(hop_[plot_id[idx]])][0][0,:,:])) > segmentation_values[idx_seg-1]).astype('int')*(np.abs(np.real(spgram_hop['hop_'+str(hop_[plot_id[idx]])][0][0,:,:])) < segmentation_values[idx_seg]).astype('int')
-                    ax.flat[6*idx+idx_seg].set_title('hop ='+str(hop_[plot_id[idx]])+'\n'+str(segmentation_values[idx_seg-1])+' < |Spgram| < '+str(segmentation_values[idx_seg]))
+                    ax.flat[(len(segmentation_values)+1)*idx+idx_seg].set_title('hop ='+str(hop_[plot_id[idx]])+'\n'+str(segmentation_values[idx_seg-1])+' < |Spgram| < '+str(segmentation_values[idx_seg]))
 
-                ax.flat[6*idx+idx_seg].imshow(seg_res,cmap='gray',origin='lower',aspect='auto',
+                ax.flat[(len(segmentation_values)+1)*idx+idx_seg].imshow(seg_res,cmap='gray',origin='lower',aspect='auto',
                                 extent = (spgram_hop['hop_'+str(hop_[plot_id[idx]])][-1][0],spgram_hop['hop_'+str(hop_[plot_id[idx]])][-1][-1],
                                 np.flip(spgram_hop['hop_'+str(hop_[plot_id[idx]])][2])[0],np.flip(spgram_hop['hop_'+str(hop_[plot_id[idx]])][2])[-1]))
+                ax.flat[(len(segmentation_values)+1)*idx+idx_seg].set_ylabel('Chemical Shift [ppm]')
+                ax.flat[(len(segmentation_values)+1)*idx+idx_seg].set_xlabel('Time [s]')
         plt.tight_layout()
         plt.savefig(results_folder+'segmentation_visual.png')
         plt.close()
@@ -467,7 +470,7 @@ if perform_stats_analysis == True:
 
     ##--------------------STATISTICS PER SEGMENTED REGION x HOP-------------------
     if norm_ == 'minmax':
-        stats_per_region = funcstud.stats_per_segmented_regions_for_different_spgrams(regions_threshold=segmentation-values,spgram_dict=spgram_hop,part='real',not_zero_centered=True,center_value=0.5)
+        stats_per_region = funcstud.stats_per_segmented_regions_for_different_spgrams(regions_threshold=segmentation_values,spgram_dict=spgram_hop,part='real',not_zero_centered=True,center_value=0.5)
         stats_global = utils.stats_global_for_different_spgrams(spgram_dict=spgram_hop,part='part',not_zero_centered=True,center_value=0.5)
     else:
         stats_per_region = funcstud.stats_per_segmented_regions_for_different_spgrams(regions_threshold=segmentation_values,spgram_dict=spgram_hop,part='real')

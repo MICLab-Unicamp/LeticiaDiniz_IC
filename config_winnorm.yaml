@@ -1,0 +1,60 @@
+fids:
+  qntty: 100
+  path_to_gt_fids: '../sample_data.h5'
+
+name_of_study: 'winnorm_study_test_no_noise'
+
+amplitude_noise:
+  add_noise: False
+  noise_config:
+    std_base: 6
+    std_var: 2
+    nmb_of_transients_to_combine: 160
+
+study_parameters:
+  param_to_vary: 'winnorm'
+  variation_details:
+      win:
+        - 'hann'
+        - 'rect'
+        - 'flat'
+      norm:
+        - 'abs'
+        - 'm1p1'
+        - 'minmax'
+        - 'zscore'
+  fixed_params:
+      'hop': 8
+      'mfft': 512
+
+save_pictures_along_the_way: True
+
+stats_analysis:
+  perform_stats_analysis: True
+  segmentation_values:
+    abs:
+      - 0.001
+      - 0.02
+      - 0.08
+      - 0.2
+      - 0.6
+    m1p1:
+      - 0.001
+      - 0.02
+      - 0.08
+      - 0.2
+      - 0.6
+    minmax:
+      - 0.0005
+      - 0.001
+      - 0.04
+      - 0.1
+      - 0.4
+    zscore:
+      - 0.015
+      - 1
+      - 3
+      - 10
+      - 25
+  save_pictures: True
+

@@ -927,3 +927,24 @@ def read_yaml(file: str) -> yaml.loader.FullLoader:
         configurations = yaml.load(yaml_file, Loader=yaml.FullLoader)
 
     return configurations
+
+def get_result_table(dict_multinfo,norm_names,window_names):
+    """
+    Define DF to print results obtained for multiple norms and windows.
+    Inputs:
+    dict_multinfo: dict with keys 'NAA', 'GABA' and 'Glx', for each key there is a list of dicts with the information for each window within each norm
+                    example: dict_multinfo['NAA'][0] = {'mean': [a,b,c,d],
+                                                        'std': [1,2,3,4]} -> mean information obtained four norm of idx 0 and with each of the four 
+                                                                            windows consired, accompanied by their respective std of the measured mean value
+    norm_names: list with the names of each norm (in the same order they appear in dict_multinfo['NAA'])
+    window_names: list with the names of each window (in the same order they appear in dict_multinfo['NAA'][0])
+    """
+    struct = {}
+    for ele in ['NAA','GABA','Glx']:
+        for j in range(len(window_names)):
+            struct[(ele, window_names[j])] = []
+            for i in range(len(norm_names)):
+                struct[(ele, window_names[j])].append("{:.2e}".format(dict_multinfo[ele][i]['mean'][j]) + '±' + "{:.2e}".format(dict_multinfo[ele][i]['std'][j]))
+               
+    df = pd.DataFrame(struct, index=norm_names)
+    return df

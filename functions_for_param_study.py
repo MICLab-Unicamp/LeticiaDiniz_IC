@@ -80,7 +80,7 @@ def concatenate_different_hop(list_hop_all,list_hop_concat_idx,spgram_dict,list_
     return spgram_concat
 
 
-def segment_relevant_peaks_dict(spgram_dict,idx_list_1ppm,idx_list_4ppm,idx_list_GABA,idx_list_NAA,idx_list_Glx,idx_time_list_0d4,idx_peaks_regions_limits_dict):
+def segment_relevant_peaks_dict(spgram_dict,idx_list_1ppm,idx_list_4ppm,idx_list_GABA,idx_list_NAA,idx_list_Glx,idx_time_list_0d4,idx_peaks_regions_limits_dict,not_zero_centered=None,center_value=None):
     """
     Get dict with segmented spectrograms in the region from 1 to 4ppm.
     We segment the GABA region, NAA e Glx using different theresholds found empirically.
@@ -101,6 +101,8 @@ def segment_relevant_peaks_dict(spgram_dict,idx_list_1ppm,idx_list_4ppm,idx_list
                                    element [j,1] - contains for the j-th FID the line_r where we find the FWHM of the NAA considering line_r > line_NAA_peak
                                    element [j,2] - contains for the j-th FID the line_NAA_peak
                                    Analogous for 'GABA' and 'Glx'.
+    not_zero_centered, center_value (optional): if not_zero_centered is True than subtracts center_value of 
+                    the spgram before considering the thresholds (thresholds are assumed to consider a center valued spgram)
     Output:
     segm_dict: dict of bool arrays, dict with the same keys as spgram_dict. Each element is an array (N,fn,tn) (fn and tn vary with x) of the segmented image in the region betwee 1 to 4ppm.
     """
@@ -113,21 +115,30 @@ def segment_relevant_peaks_dict(spgram_dict,idx_list_1ppm,idx_list_4ppm,idx_list
             line_plus_GABA = int(idx_peaks_regions_limits_dict[list_of_keys[i]]['GABA'][j,1])+1
             
             #values larger than the mean of the GABA line
-            aux = (np.real(spgram_dict[list_of_keys[i]][0][j,line_minus_GABA:line_plus_GABA,:]) > np.mean(np.real(spgram_dict[list_of_keys[i]][0][j,idx_list_GABA[i],:]))).astype(bool)
+            if not_zero_centered == True and center_value != None:
+                aux = ((np.real(spgram_dict[list_of_keys[i]][0][j,line_minus_GABA:line_plus_GABA,:])-center_value) > np.mean(np.real(spgram_dict[list_of_keys[i]][0][j,idx_list_GABA[i],:])-center_value)).astype(bool)
+            else:
+                aux = (np.real(spgram_dict[list_of_keys[i]][0][j,line_minus_GABA:line_plus_GABA,:]) > np.mean(np.real(spgram_dict[list_of_keys[i]][0][j,idx_list_GABA[i],:]))).astype(bool)
             segm_dict[list_of_keys[i]][j,line_minus_GABA-idx_list_1ppm[i]:line_plus_GABA-idx_list_1ppm[i],:] = aux
 
             line_minus_NAA = int(idx_peaks_regions_limits_dict[list_of_keys[i]]['NAA'][j,0])
             line_plus_NAA = int(idx_peaks_regions_limits_dict[list_of_keys[i]]['NAA'][j,1])+1
 
             #abs values > mean abs value at the NAA line between 0.2 till 0.4s
-            aux = (np.abs(np.real(spgram_dict[list_of_keys[i]][0][j,line_minus_NAA:line_plus_NAA,:])) > np.mean(np.abs(np.real(spgram_dict[list_of_keys[i]][0][j,idx_list_NAA[i],int(idx_time_list_0d4[i]/2):idx_time_list_0d4[i]])))).astype(bool)
+            if not_zero_centered == True and center_value != None:
+                aux = (np.abs(np.real(spgram_dict[list_of_keys[i]][0][j,line_minus_NAA:line_plus_NAA,:])-center_value) > np.mean(np.abs(np.real(spgram_dict[list_of_keys[i]][0][j,idx_list_NAA[i],int(idx_time_list_0d4[i]/2):idx_time_list_0d4[i]])-center_value))).astype(bool)
+            else:
+                aux = (np.abs(np.real(spgram_dict[list_of_keys[i]][0][j,line_minus_NAA:line_plus_NAA,:])) > np.mean(np.abs(np.real(spgram_dict[list_of_keys[i]][0][j,idx_list_NAA[i],int(idx_time_list_0d4[i]/2):idx_time_list_0d4[i]])))).astype(bool)
             segm_dict[list_of_keys[i]][j,line_minus_NAA-idx_list_1ppm[i]:line_plus_NAA-idx_list_1ppm[i],:] =  aux
 
             line_minus_Glx = int(idx_peaks_regions_limits_dict[list_of_keys[i]]['Glx'][j,0])
             line_plus_Glx = int(idx_peaks_regions_limits_dict[list_of_keys[i]]['Glx'][j,1])+1
 
             #abs values > std at the Glx line
-            aux = (np.abs(np.real(spgram_dict[list_of_keys[i]][0][j,line_minus_Glx:line_plus_Glx,:])) > np.std(np.real(spgram_dict[list_of_keys[i]][0][j,idx_list_Glx[i],:]))).astype(bool)    
+            if not_zero_centered == True and center_value != None:
+                aux = (np.abs(np.real(spgram_dict[list_of_keys[i]][0][j,line_minus_Glx:line_plus_Glx,:])-center_value) > np.std(np.real(spgram_dict[list_of_keys[i]][0][j,idx_list_Glx[i],:])-center_value)).astype(bool)    
+            else:
+                aux = (np.abs(np.real(spgram_dict[list_of_keys[i]][0][j,line_minus_Glx:line_plus_Glx,:])) > np.std(np.real(spgram_dict[list_of_keys[i]][0][j,idx_list_Glx[i],:]))).astype(bool)    
             segm_dict[list_of_keys[i]][j,line_minus_Glx-idx_list_1ppm[i]:line_plus_Glx-idx_list_1ppm[i],:] =  aux
     
     return segm_dict
