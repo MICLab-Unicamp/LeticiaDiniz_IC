@@ -2,7 +2,7 @@ fids:
   qntty: 100
   path_to_gt_fids: '../sample_data.h5'
 
-name_of_study: 'winnorm_study_test_no_noise'
+name_of_study: 'winnorm_study_no_noise'
 
 amplitude_noise:
   add_noise: False
@@ -37,16 +37,16 @@ stats_analysis:
       - 0.02
       - 0.08
       - 0.2
-      - 0.6
+      - 0.8
     m1p1:
       - 0.001
       - 0.02
       - 0.08
       - 0.2
-      - 0.6
+      - 0.8
     minmax:
       - 0.0005
-      - 0.001
+      - 0.01
       - 0.04
       - 0.1
       - 0.4
@@ -57,4 +57,3 @@ stats_analysis:
       - 10
       - 25
   save_pictures: True
-

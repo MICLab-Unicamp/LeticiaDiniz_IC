@@ -43,7 +43,7 @@ for n in norm_:
         raise Exception('Unknown normalization. Check function get_normalized_spectrogram in utils.py and addapt it to handle the desired normalization. Check also FWHM, peaks length and statistics calculation if norm is not zero centered.') 
 
 hop_ = int(config['study_parameters']['fixed_params'].get('hop',8))
-mfft_ = int(config['study_parameters']['fixed_params'].get('win','hann'))
+mfft_ = int(config['study_parameters']['fixed_params'].get('mfft',512))
 
 window_ = []
 for win in win_name:
@@ -53,8 +53,8 @@ for win in win_name:
         window_.append(boxcar(mfft_,sym=True))
     elif win == 'flat':
         window_.append(flattop(mfft_,sym=True))
-else:
-    raise Exception('Unknown window type. Please check the script and addapt it to handle the desired window.')
+    else:
+        raise Exception('Unknown window type. Please check the script and addapt it to handle the desired window.')
 
 perform_stats_analysis = bool(config['stats_analysis'].get('perform_stats_analysis',False))
 if perform_stats_analysis == True:
@@ -250,8 +250,8 @@ if save_pictures_along_the_way == True:
             title_aux=title_aux+win_name[j]
     fig,ax = plt.subplots(math.ceil(len(norm_)/2),2,figsize=(16,8))
     for i in range(len(norm_)):
-        aux_m = np.mean(np.real(spgram_wn['norm_'+norm_[i]][0]))
-        aux_s = np.std(np.real(spgram_wn['norm_'+norm_[i]][0]))
+        aux_m = np.mean(np.real(concat_by_norm['norm_'+norm_[i]]))
+        aux_s = np.std(np.real(concat_by_norm['norm_'+norm_[i]]))
         im = ax.flat[i].imshow(np.real(concat_by_norm['norm_'+norm_[i]][idx_freq_1ppm[i][0]:idx_freq_4ppm[i][0],:]), origin='lower', aspect='auto',cmap='gray',vmin=aux_m-aux_s,vmax=aux_m+aux_s,
                 extent = (0,concat_by_norm['norm_'+norm_[0]].shape[-1],np.flip(spgram_wn['norm_'+norm_[i]]['window_'+win_name[0]][2])[idx_freq_1ppm[i][0]],np.flip(spgram_wn['norm_'+norm_[i]]['window_'+win_name[0]][2])[idx_freq_4ppm[i][0]]))
         fig.colorbar(im, ax=ax.flat[i])
@@ -304,16 +304,16 @@ if save_pictures_along_the_way == True:
     plt.close()
 
     ##--------------------FWHM MEASURED IN ABS/REAL PROJECTION------------------------------
-    df_fwhm =  get_result_table(fwhm_wn,norm_,win_name)
+    df_fwhm =  utils.get_result_table(fwhm_wn,norm_,win_name)
     with open(results_folder+'fwhm_abs_proj.html', 'w') as f:
         f.write(df_fwhm.to_html())
-    df_fwhm =  get_result_table(fwhm_wn_real,norm_,win_name)
+    df_fwhm =  utils.get_result_table(fwhm_wn_real,norm_,win_name)
     with open(results_folder+'fwhm_real_proj.html', 'w') as f:
         f.write(df_fwhm.to_html())
 
     ##---------------------ZCR---------------------------------------------------------
     print("Save ZCR figure...")
-    df_zcr = get_result_table(zcr_,norm_,win_name)
+    df_zcr = utils.get_result_table(zcr_,norm_,win_name)
     with open(results_folder+'zcr.html', 'w') as f:
         f.write(df_zcr.to_html())
 
@@ -324,7 +324,7 @@ if save_pictures_along_the_way == True:
         sum_segment_df_form['NAA'].append(sum_segment['norm_'+norm_[i]]['NAA'])
         sum_segment_df_form['GABA'].append(sum_segment['norm_'+norm_[i]]['GABA'])
         sum_segment_df_form['Glx'].append(sum_segment['norm_'+norm_[i]]['Glx'])
-    df_length = get_result_table(sum_segment_df_form,norm_,win_name)
+    df_length = utils.get_result_table(sum_segment_df_form,norm_,win_name)
     with open(results_folder+'peaks_length.html', 'w') as f:
         f.write(df_length.to_html())
 
@@ -398,8 +398,14 @@ if perform_stats_analysis == True:
     ##--------------------SEGMENTATION BASED ON ABS VALUES------------------------
     if save_pictures_stats == True:
         ##-------------------- SEGMENTATION FIGURE--------------------------------
+        for idx_n,n in enumerate(norm_):
+            if idx_n == 0:
+                max_seg = len(segmentation_values[n])
+            else:
+                if len(segmentation_values[n]) > max_seg:
+                    max_seg = len(segmentation_values[n]) 
         for n in norm_:
-            fig,ax = plt.subplots(len(win_name),len(segmentation_values)+1,figsize=(16,16))
+            fig,ax = plt.subplots(len(win_name),max_seg+1,figsize=(16,16))
             for j in range(len(window_)):
                 if n == 'minmax':
                     aux_bin = np.abs(np.real(spgram_wn['norm_'+n]['window_'+win_name[j]][0][0,:,:])-0.5)
@@ -408,21 +414,21 @@ if perform_stats_analysis == True:
                 extent_seq = (spgram_wn['norm_'+n]['window_'+win_name[j]][-1][0],spgram_wn['norm_'+n]['window_'+win_name[j]][-1][-1],
                             np.flip(spgram_wn['norm_'+n]['window_'+win_name[j]][2])[0],np.flip(spgram_wn['norm_'+n]['window_'+win_name[j]][2])[-1])
                 
-                for idx_seg in range(len(segmentation_values)+1):
+                for idx_seg in range(len(segmentation_values[n])+1):
                     if idx_seg == 0:
                         seg_res = (aux_bin < segmentation_values[n][idx_seg]).astype('int')
-                        ax.flat[(len(segmentation_values)+1)*j+idx_seg].set_title('win ='+win_name[j]+'\n |Spgram| < '+str(segmentation_values[idx_seg]))
-                    elif idx_seg == len(segmentation_values):
+                        ax.flat[(max_seg+1)*j+idx_seg].set_title('win ='+win_name[j]+'\n |Spgram| < '+str(segmentation_values[n][idx_seg]))
+                    elif idx_seg == len(segmentation_values[n]):
                         seg_res = (aux_bin > segmentation_values[n][idx_seg-1]).astype('int')
-                        ax.flat[(len(segmentation_values)+1)*j+idx_seg].set_title('win ='+win_name[j]+'\n |Spgram| > '+str(segmentation_values[idx_seg-1]))
+                        ax.flat[(max_seg+1)*j+idx_seg].set_title('win ='+win_name[j]+'\n |Spgram| > '+str(segmentation_values[n][idx_seg-1]))
                     else:
                         seg_res = (aux_bin > segmentation_values[n][idx_seg-1]).astype('int')*(aux_bin < segmentation_values[n][idx_seg]).astype('int')
-                        ax.flat[(len(segmentation_values)+1)*j+idx_seg].set_title('win ='+win_name[j]+'\n'+str(segmentation_values[idx_seg-1])+' < |Spgram| < '+str(segmentation_values[idx_seg]))
+                        ax.flat[(max_seg+1)*j+idx_seg].set_title('win ='+win_name[j]+'\n'+str(segmentation_values[n][idx_seg-1])+' < |Spgram| < '+str(segmentation_values[n][idx_seg]))
                     
-                    ax.flat[(len(segmentation_values)+1)*j+idx_seg].imshow(seg_res,cmap='gray',origin='lower',aspect='auto',
+                    ax.flat[(max_seg+1)*j+idx_seg].imshow(seg_res,cmap='gray',origin='lower',aspect='auto',
                                 extent = extent_seq)
-                    ax.flat[(len(segmentation_values)+1)*j+idx_seg].set_ylabel('Chemical Shift [ppm]')
-                    ax.flat[(len(segmentation_values)+1)*j+idx_seg].set_xlabel('Time [s]')
+                    ax.flat[(max_seg+1)*j+idx_seg].set_ylabel('Chemical Shift [ppm]')
+                    ax.flat[(max_seg+1)*j+idx_seg].set_xlabel('Time [s]')
             plt.tight_layout()
             plt.savefig(results_folder+'segmentation_visual_norm_'+n+'.png')
             plt.close()
@@ -432,9 +438,9 @@ if perform_stats_analysis == True:
     qntty_percent_regions = {}
     for i in range(len(norm_)):
         if norm_[i] == 'minmax':
-            hist, bins, bins_centered, qntty_percent_regions['norm_'+norm_[i]] = funcstud.histogram_for_different_spgram_and_qntty_per_histogram_region(spgram_dict=aux,nbins=5000,part='real',regions=regions[norm_[i]],normalized=True,not_zero_centered=True,center_value=0.5)
+            hist, bins, bins_centered, qntty_percent_regions['norm_'+norm_[i]] = funcstud.histogram_for_different_spgram_and_qntty_per_histogram_region(spgram_dict=spgram_wn['norm_'+norm_[i]],nbins=5000,part='real',regions=segmentation_values[norm_[i]],normalized=True,not_zero_centered=True,center_value=0.5)
         else:
-            hist, bins, bins_centered, qntty_percent_regions['norm_'+norm_[i]] = funcstud.histogram_for_different_spgram_and_qntty_per_histogram_region(spgram_dict=aux,nbins=5000,part='real',regions=regions[norm_[i]],normalized=True)
+            hist, bins, bins_centered, qntty_percent_regions['norm_'+norm_[i]] = funcstud.histogram_for_different_spgram_and_qntty_per_histogram_region(spgram_dict=spgram_wn['norm_'+norm_[i]],nbins=5000,part='real',regions=segmentation_values[norm_[i]],normalized=True)
 
 
     if save_pictures_stats == True:
@@ -470,9 +476,9 @@ if perform_stats_analysis == True:
     stats_global = {}
     for i in range(len(norm_)):
         if norm_[i] == 'minmax':
-            stats_per_region['norm_'+norm_[i]] = funcstud.stats_per_segmented_regions_for_different_spgrams(regions_threshold=regions[norm_[i]],spgram_dict=spgram_wn['norm_'+norm_[i]], part='real', not_zero_centered=True, center_value=0.5)
+            stats_per_region['norm_'+norm_[i]] = funcstud.stats_per_segmented_regions_for_different_spgrams(regions_threshold=segmentation_values[norm_[i]],spgram_dict=spgram_wn['norm_'+norm_[i]], part='real', not_zero_centered=True, center_value=0.5)
         else:
-            stats_per_region['norm_'+norm_[i]] = funcstud.stats_per_segmented_regions_for_different_spgrams(regions_threshold=regions[norm_[i]],spgram_dict=spgram_wn['norm_'+norm_[i]], part='real')
+            stats_per_region['norm_'+norm_[i]] = funcstud.stats_per_segmented_regions_for_different_spgrams(regions_threshold=segmentation_values[norm_[i]],spgram_dict=spgram_wn['norm_'+norm_[i]], part='real')
         stats_global['norm_'+norm_[i]] = utils.stats_global_for_different_spgrams(spgram_dict=spgram_wn['norm_'+norm_[i]], part='part')
 
     if save_pictures_stats == True:

@@ -4,6 +4,8 @@ import numpy as np
 from data_corruption import TransientMaker
 from scipy.signal import ShortTimeFFT
 import yaml
+import pandas as pd
+
 
 def create_corrupted_fids(gt, t, std_base, std_var, ntransients=160):
     """
@@ -944,7 +946,7 @@ def get_result_table(dict_multinfo,norm_names,window_names):
         for j in range(len(window_names)):
             struct[(ele, window_names[j])] = []
             for i in range(len(norm_names)):
-                struct[(ele, window_names[j])].append("{:.2e}".format(dict_multinfo[ele][i]['mean'][j]) + '±' + "{:.2e}".format(dict_multinfo[ele][i]['std'][j]))
+                struct[(ele, window_names[j])].append("{:.2e}".format(dict_multinfo[ele][i]['mean'][j]) + '+-' + "{:.2e}".format(dict_multinfo[ele][i]['std'][j]))
                
     df = pd.DataFrame(struct, index=norm_names)
     return df
