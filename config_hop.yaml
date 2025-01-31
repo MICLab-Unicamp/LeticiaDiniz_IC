@@ -2,7 +2,7 @@ fids:
   qntty: 100
   path_to_gt_fids: '../sample_data.h5'
 
-name_of_study: 'hop_study_test_no_noise'
+name_of_study: 'hop_study_no_noise'
 
 amplitude_noise:
   add_noise: False

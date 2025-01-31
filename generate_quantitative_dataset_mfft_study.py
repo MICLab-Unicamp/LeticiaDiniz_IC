@@ -117,7 +117,7 @@ b = ppm[0,idx_max] - a*freq[idx_max]
 ##--------------------CREATE NOISY TRANSIENTS IF DESIRED------------------------------
 if add_noise_to_fids == True:
     print('Creating noisy transients by sampling '+str(qntty)+' Sigma_i values from uniform distribution ['+
-            str(noise_std_base-noise_std_var)+','+std(noise_std_base+noise_std_var)+'). From each GT_i transient, we create '+
+            str(noise_std_base-noise_std_var)+','+str(noise_std_base+noise_std_var)+'). From each GT_i transient, we create '+
             str(noise_nmb_of_transients_to_combine)+' transients by adding amplitude noise from a normal distribuiton (0,Sigma_i). \n These '
             +str(noise_nmb_of_transients_to_combine)+' transients are then combined, so we get '+
             str(qntty)+' noisy fids to work with during the study.')
@@ -165,8 +165,8 @@ for i in range(len(mfft_)):
     if norm_ == 'minmax':
         aux_mean_minmax = np.mean(np.real(spgram_mfft['mfft_'+str(mfft_[i])][0]),axis=(1,2),keepdims=True)
         aux_minmax = np.real(spgram_mfft['mfft_'+str(mfft_[i])][0]) - aux_mean_minmax
-        list_projections_abs.np.sum(np.abs(aux_minmax),axis=2)
-        list_projections_abs.np.sum(aux_minmax,axis=2)
+        list_projections_abs.append(np.sum(np.abs(aux_minmax),axis=2))
+        list_projections_real.append(np.sum(aux_minmax,axis=2))
     else:
         list_projections_abs.append(np.sum(np.abs(np.real(spgram_mfft['mfft_'+str(mfft_[i])][0])), axis = 2))
         list_projections_real.append(np.sum(np.real(spgram_mfft['mfft_'+str(mfft_[i])][0]), axis = 2))
@@ -464,6 +464,7 @@ if perform_stats_analysis == True:
         plt.close()
 
     ##--------------------QNTTY OF PIXELS PER SEGMENTED REGION x MFFT-------------
+    print('Calculating qntty of pixels per segmented region...')
     if norm_ == 'minmax':
         hist, bins, bins_centered, qntty_percent_regions = funcstud.histogram_for_different_spgram_and_qntty_per_histogram_region(spgram_dict=spgram_mfft,nbins=5000,part='real',regions=segmentation_values,normalized=True,not_zero_centered=True,center_value=0.5)
         hist_absolute, bins_absolute, bins_centered_absolute, qntty_absolute_regions = funcstud.histogram_for_different_spgram_and_qntty_per_histogram_region(spgram_dict=spgram_mfft,nbins=5000,part='real',regions=segmentation_values,normalized=False,not_zero_centered=True,center_value=0.5)
@@ -498,12 +499,12 @@ if perform_stats_analysis == True:
         plt.close()
 
     ##--------------------STATISTICS PER SEGMENTED REGION x MFFT------------------
+    print('Calculating stats per segmented region...')
     if norm_ == 'minmax':
         stats_per_region = funcstud.stats_per_segmented_regions_for_different_spgrams(regions_threshold=segmentation_values,spgram_dict=spgram_mfft,part='real',not_zero_centered=True,center_value=0.5)
-        stats_global = utils.stats_global_for_different_spgrams(spgram_dict=spgram_mfft,part='part',not_zero_centered=True,center_value=0.5)
     else:
         stats_per_region = funcstud.stats_per_segmented_regions_for_different_spgrams(regions_threshold=segmentation_values,spgram_dict=spgram_mfft,part='real')
-        stats_global = utils.stats_global_for_different_spgrams(spgram_dict=spgram_mfft,part='part')
+    stats_global = utils.stats_global_for_different_spgrams(spgram_dict=spgram_mfft,part='part')
 
     if save_pictures_stats == True:
         ##--------------------STATISTICS PER SEGM. REGION FIGURE------------------

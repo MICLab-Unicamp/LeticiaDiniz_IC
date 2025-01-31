@@ -117,7 +117,7 @@ b = ppm[0,idx_max] - a*freq[idx_max]
 ##--------------------CREATE NOISY TRANSIENTS IF DESIRED------------------------------
 if add_noise_to_fids == True:
     print('Creating noisy transients by sampling '+str(qntty)+' Sigma_i values from uniform distribution ['+
-            str(noise_std_base-noise_std_var)+','+std(noise_std_base+noise_std_var)+'). From each GT_i transient, we create '+
+            str(noise_std_base-noise_std_var)+','+str(noise_std_base+noise_std_var)+'). From each GT_i transient, we create '+
             str(noise_nmb_of_transients_to_combine)+' transients by adding amplitude noise from a normal distribuiton (0,Sigma_i). \n These '
             +str(noise_nmb_of_transients_to_combine)+' transients are then combined, so we get '+
             str(qntty)+' noisy fids to work with during the study.')
@@ -428,6 +428,7 @@ if perform_stats_analysis == True:
             plt.close()
                 
     ##--------------------QNTTY OF PIXELS PER SEGMENTED REGION--------------------
+    print('Calculating qntty of pixels per segmented region...')
     qntty_percent_regions = {}
     for i in range(len(norm_)):
         if norm_[i] == 'minmax':
@@ -464,6 +465,7 @@ if perform_stats_analysis == True:
         plt.close()
 
     ##--------------------STATISTICS PER SEGMENTED REGION-------------------------
+    print('Calculating stats per segmented region...')
     stats_per_region = {}
     stats_global = {}
     for i in range(len(norm_)):
