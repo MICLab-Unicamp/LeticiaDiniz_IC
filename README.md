@@ -16,7 +16,7 @@ A STFT é interessante, pois ela carrega informações frequenciais e temporais 
 
 A construção da STFT depende de uma janela que percorre o sinal no tempo e em cada posição realiza a FT do sinal englobado (Fig. 1). O passo, tamanho e formato da janela são parâmetros dessa função, e referidos neste trabalho como *hop*,*mfft* e *win*, respectivamente. Além disso, para a visualização da STFT a normalização da função (*norm*) e a componente visualizada (*p*) também são parâmetros importantes. Neste trabalho, visto o interesse na utilização da STFT para representar sinais FID de GABA, busca-se caracterizar como a variação dos parâmetros da STFT afetam a imagem visualizada. Além disso, busca-se caracterizar como propriedades do sinal, como o nível de ruído, se manifestam no domínio da STFT.
 
-![Descrição parâmetros de construção da STFT e parâmetros de visualização STFT.](figuras/imagem_stft.jpg)
+![Descrição parâmetros de construção da STFT e parâmetros de visualização STFT.](figures/imagem_stft.jpg)
 
 Figura 1: Descrição dos parâmetros de construção e de visualização da STFT.
 
@@ -30,46 +30,46 @@ Ao leitor interessado no contexto, dados e maiores explicações da metodologia 
 
 Este repositório contém cinco notebooks descrevendo os resultados obtidos na caracterização do espectrograma de GABA:
 
-- ![Noise Study](STFT_NoiseStudy.ipynb): Contém os resultados da caracterização do espectrograma com relação a adição de ruído de amplitude aos transientes. Neste, descreve-se como esse tipo de ruído se manifesta no domínio do espectrograma e propõe-se três métodos para estimar o nível de ruído nesse novo domínio. Dois dentre os três métodos envolvem o uso de uma projeção do espectrograma na frequência, projeções essas que possuem características interessantes e que permitem, além da estimação do ruído, a estimação da largura dos picos do espectrograma. Neste documento, encontra-se ainda gráficos mostrando a evolução de características estatísticas de diferentes regiões do espectrograma em função do nível de ruído adicionado aos transientes. Como características estatísticas, considera-se: média, mediana, desvio-padrão, skewness e kurtosis.
+- [Noise Study](STFT_NoiseStudy.ipynb): Contém os resultados da caracterização do espectrograma com relação a adição de ruído de amplitude aos transientes. Neste, descreve-se como esse tipo de ruído se manifesta no domínio do espectrograma e propõe-se três métodos para estimar o nível de ruído nesse novo domínio. Dois dentre os três métodos envolvem o uso de uma projeção do espectrograma na frequência, projeções essas que possuem características interessantes e que permitem, além da estimação do ruído, a estimação da largura dos picos do espectrograma. Neste documento, encontra-se ainda gráficos mostrando a evolução de características estatísticas de diferentes regiões do espectrograma em função do nível de ruído adicionado aos transientes. Como características estatísticas, considera-se: média, mediana, desvio-padrão, skewness e kurtosis.
 
-- ![Hop Variation Results](STFT_HopVariation_Results_with_and_without_noise.ipynb): Contém os resultados da caracterização do espectrograma com relação a variação do *hop*. Neste, descreve-se como o *hop* afeta a resolução temporal da imagem e a aparência (listras) dos picos. Avalia-se ainda o impacto desse parâmetro na resolução frequencial dos picos menos intensos da imagem e dos picos mais importantes. Como estudo complementar, observa-se ainda como características estatísticas de diferentes regiões do espectrograma variam em função do *hop*. A Figura 2 apresenta um resumo dos principais efeitos do *hop*.
+- [Hop Variation Results](STFT_HopVariation_Results_with_and_without_noise.ipynb): Contém os resultados da caracterização do espectrograma com relação a variação do *hop*. Neste, descreve-se como o *hop* afeta a resolução temporal da imagem e a aparência (listras) dos picos. Avalia-se ainda o impacto desse parâmetro na resolução frequencial dos picos menos intensos da imagem e dos picos mais importantes. Como estudo complementar, observa-se ainda como características estatísticas de diferentes regiões do espectrograma variam em função do *hop*. A Figura 2 apresenta um resumo dos principais efeitos do *hop*.
 
-- ![Mfft Variation Results](STFT_MfftVariation_Results_with_and_without_noise.ipynb): Contém os resultados da caracterização do espectrograma com relação a variação da *mfft*. Neste, descreve-se como a *mfft* afeta a resolução frequencial da imagem, impactando a largura e comprimento dos picos. Avalia-se ainda se esse parâmetro afeta a aparência dos picos. A Figura 3 apresenta um resumo dos principais efeitos da *mfft*.
-
-
-- ![WinNorm Variation Results](STFT_MfftVariation_Results_with_and_without_noise.ipynb): Contém os resultados da caracterização do espectrograma com relação a variação de *win* e *norm*. Neste, descreve-se como a combinação de tais parâmetros afeta a largura, comprimento e aparência dos picos. Também investiga-se o efeito da variação de tais parâmetros em características estatísitcas da imagem.
+- [Mfft Variation Results](STFT_MfftVariation_Results_with_and_without_noise.ipynb): Contém os resultados da caracterização do espectrograma com relação a variação da *mfft*. Neste, descreve-se como a *mfft* afeta a resolução frequencial da imagem, impactando a largura e comprimento dos picos. Avalia-se ainda se esse parâmetro afeta a aparência dos picos. A Figura 3 apresenta um resumo dos principais efeitos da *mfft*.
 
 
-- ![Hop Variation Considerations for Different Mfft](STFT_HopVariation_Considerations_for_different_mfft_data_without_noise.ipynb): Notebook complementar. Neste notebook, busca-se compreender se os resultados obtidos no estudo individual do *hop* se gerneralizam para valores diferentes de *mfft*.
+- [WinNorm Variation Results](STFT_MfftVariation_Results_with_and_without_noise.ipynb): Contém os resultados da caracterização do espectrograma com relação a variação de *win* e *norm*. Neste, descreve-se como a combinação de tais parâmetros afeta a largura, comprimento e aparência dos picos. Também investiga-se o efeito da variação de tais parâmetros em características estatísitcas da imagem.
 
 
-![Descrição principais efeitos da variação do hop.](figuras/imagem_hop.jpg)
+- [Hop Variation Considerations for Different Mfft](STFT_HopVariation_Considerations_for_different_mfft_data_without_noise.ipynb): Notebook complementar. Neste notebook, busca-se compreender se os resultados obtidos no estudo individual do *hop* se gerneralizam para valores diferentes de *mfft*.
+
+
+![Descrição principais efeitos da variação do hop.](figures/imagem_hop.jpg)
 
 Figura 2: Descrição principais efeitos da variação do *hop*.
 
-![Descrição principais efeitos da variação da hop.](figuras/imagem_mfft.jpg)
+![Descrição principais efeitos da variação da hop.](figures/imagem_mfft.jpg)
 
 Figura 3: Descrição principais efeitos da variação da *mfft*.
 
 Os resultados apresentados nos notebooks mencionados acima são qualitativos e quantitativos. Para a geração dos resultados quantitativos, três scripts são utilizados:
 
-- ![Hop Study](generate_quantitative_dataset_hop_study.py)
+- [Hop Study](generate_quantitative_dataset_hop_study.py)
 
-- ![Mfft Study](generate_quantitative_dataset_mfft_study.py)
+- [Mfft Study](generate_quantitative_dataset_mfft_study.py)
 
-- ![WinNorm Study](generate_quantitative_dataset_winnorm_study.py)
+- [WinNorm Study](generate_quantitative_dataset_winnorm_study.py)
 
 A forma de utilização de tais scripts está descrita na Seção [Como gerar resultados quantitativos](#como-gerar-resultados-quantitativos).
 
 Além desses, os scripts 
 
-- ![Functions for Noise Study](functions_for_noise_study.py)
+- [Functions for Noise Study](functions_for_noise_study.py)
 
-- ![Functions for Parameter Study](functions_for_param_study.py)
+- [Functions for Parameter Study](functions_for_param_study.py)
 
-- ![Utils](utils.py)
+- [Utils](utils.py)
 
-- ![Data corruption](data_corruption.py)
+- [Data corruption](data_corruption.py)
 
 contém funções auxiliares utilizadas na geração e análise de resultados quantitativos e qualitativos.
 
@@ -147,6 +147,6 @@ stats_analysis:
   save_pictures: True/False #se True, salva imagens da análise durante execução do script
 ```
 
-Para maiores esclarecimentos, sugere-se a leitura do notebook: ![Hop Variation Results](STFT_HopVariation_Results_with_and_without_noise.ipynb).
+Para maiores esclarecimentos, sugere-se a leitura do notebook: [Hop Variation Results](STFT_HopVariation_Results_with_and_without_noise.ipynb).
 
 Exemplos de arquivos YAML e de datasets quantitativos estão disponibilizados neste repositório. 
