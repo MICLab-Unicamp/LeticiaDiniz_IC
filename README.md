@@ -73,7 +73,7 @@ Além desses, os scripts
 
 contém funções auxiliares utilizadas na geração e análise de resultados quantitativos e qualitativos.
 
-Finalmente, pastas adicionais contém notebooks originais para a geração de resultados quantitativos e a abordagem inicial realizada para o estudo do ruído, a qual foi substituída pela abordagem presente em ![Noise Study](STFT_NoiseStudy.ipynb) por essa parecer mais pertinente para a caracterização do espectrograma.
+Finalmente, pastas adicionais contém notebooks originais para a geração de resultados quantitativos e a abordagem inicial realizada para o estudo do ruído, a qual foi substituída pela abordagem presente em [Noise Study](STFT_NoiseStudy.ipynb) por essa parecer mais pertinente para a caracterização do espectrograma.
 
 ## Como gerar resultados quantitativos
 
