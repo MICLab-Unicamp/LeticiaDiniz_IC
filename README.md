@@ -20,7 +20,9 @@ A construção da STFT depende de uma janela que percorre o sinal no tempo e em 
 
 Figura 1: Descrição dos parâmetros de construção e de visualização da STFT.
 
-Nos documentos deste repositório encontra-se a caracterização da STFT com relação ao nível de ruído dos transientes, e da variação do *hop*, *mfft* e, conjuntamente, de *win* e *norm*. Para tal, utilizou-se transientes GABA-editados simulados disponibilizados pelo desafio [Edited-MRS Reconstruction Challenge](https://sites.google.com/view/edited-mrs-rec-challenge/home).
+Nos documentos deste repositório encontra-se a caracterização da STFT com relação ao nível de ruído dos transientes, e da variação do *hop*, *mfft* e, conjuntamente, de *win* e *norm*. Para tal, utilizou-se transientes GABA-editados simulados disponibilizados pelo desafio [Edited-MRS Reconstruction Challenge](https://sites.google.com/view/edited-mrs-rec-challenge/home). 
+
+Um estudo adicional deste trabalho refere-se a caracterização da performance do [SpectroVit](https://pubmed.ncbi.nlm.nih.gov/39069027/) em função da variação do *hop*. O repositório associado a esse estudo encontra-se disponível [aqui](https://github.com/lets-diniz/IC_SpectroVit).
 
 Ao leitor interessado no contexto, dados e maiores explicações da metodologia do trabalho sugere-se leitura da publicação parcial do trabalho: [Resumo Apresentado no XXXII Congresso de Iniciação Científica da UNICAMP](https://prp.unicamp.br/inscricao-congresso/resumos/2024P23809A32091O2964.pdf)
 
