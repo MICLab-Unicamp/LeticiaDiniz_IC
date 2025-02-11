@@ -152,3 +152,9 @@ stats_analysis:
 Para maiores esclarecimentos, sugere-se a leitura do notebook: [Hop Variation Results](STFT_HopVariation_Results_with_and_without_noise.ipynb).
 
 Exemplos de arquivos YAML e de datasets quantitativos estão disponibilizados neste repositório. 
+
+## Créditos
+
+- Esse estudo utilizou dados obtidos do desafio [Edited-MRS Reconstruction Challenge](https://sites.google.com/view/edited-mrs-rec-challenge/home). 
+
+- O script de Data Augmentation foi adaptado do repositório do desafio [Edited-MRS Reconstruction Challenge](https://github.com/rmsouza01/Edited-MRS-challenge).
