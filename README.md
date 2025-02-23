@@ -16,7 +16,7 @@ The STFT is valuable because it contains both frequency and temporal information
 
 The STFT construction depends on a window moving over the signal in time, performing the FT at each position (Fig. 1). The parameters include the step (*hop*), window size (*mfft*), and window shape (*win*). For visualization, normalization (*norm*) and the selected component (*p*) are also essential. This work focuses on how varying these parameters affects the visualized STFT image and how signal properties, such as noise levels, manifest in the STFT domain.
 
-![Description of STFT construction and visualization parameters.](figures/imagem_stft.jpg)
+![Description of STFT construction and visualization parameters.](figures/imagem_stft_eng.jpg)
 
 Figure 1: Description of STFT construction and visualization parameters.
 
@@ -42,11 +42,11 @@ This repository contains five notebooks detailing the results of the GABA spectr
 
 - [Hop Variation Considerations for Different Mfft](STFT_HopVariation_Considerations_for_different_mfft_data_without_noise.ipynb): A complementary notebook exploring whether the *hop* variation findings generalize across different *mfft* values.
 
-![Description of the main effects of hop variation.](figures/imagem_hop.jpg)
+![Description of the main effects of hop variation.](figures/imagem_hop_eng.jpg)
 
 Figure 2: Description of the main effects of *hop* variation.
 
-![Description of the main effects of mfft variation.](figures/imagem_mfft.jpg)
+![Description of the main effects of mfft variation.](figures/imagem_mfft_eng.jpg)
 
 Figure 3: Description of the main effects of *mfft* variation.
 
