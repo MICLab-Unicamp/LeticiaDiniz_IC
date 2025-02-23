@@ -1,59 +1,56 @@
-# Compreendendo a Representação de Espectroscopia por Ressonância Magnética para Quantificação de GABA via Espectrograma
+# Understanding Magnetic Resonance Spectroscopy Representation for GABA Quantification via Spectrogram
 
-Este repositório contém experimentos realizados para o projeto de iniciação científica entitulado: **Espectroscopia por ressonância magnética (MRS) para quantificação GABA: compreendendo a representação por espectrograma para aperfeiçoar o treinamento de um modelo de reconstrução baseado em Deep-Learning**, realizado no laboratório **Medical Image Computing Lab (MICLab)** da **Faculdade de Engenharia Elétrica e de Computação (FEEC)** com financiamento da **FAPESP** (projeto: 2024/01294-2).
+This repository contains experiments conducted for the undergraduate research project entitled: **Magnetic Resonance Spectroscopy (MRS) for GABA Quantification: Understanding Spectrogram Representation to Improve the Training of a Deep-Learning-Based Reconstruction Model**, carried out at the **Medical Image Computing Lab (MICLab)** of the **Faculty of Electrical and Computer Engineering (FEEC)** with funding from **FAPESP** (project: 2024/01294-2).
 
-Orientadora: Letícia Rittner
+Supervisor: Letícia Rittner
 
-Orientanda: Letícia Diniz
+Student: Letícia Diniz
 
-Resumo do projeto: O Ácido Gama-aminobutírico (GABA) é o principal neurotransmissor inibitório do sistema nervoso e deficiências nos níveis de GABA estão associadas a síndromes psiquiátricas, tais como a depressão. Dada sua importância, existe interesse em quantificar a concentração de GABA *in vivo*. Para tal, utiliza-se a técnica de espectroscopia por ressonância magnética (MRS), na qual múltiplos transientes de GABA são adquiridos e seus espectros analisados. O problema dessa técnica é que ela exige aquisições demoradas e desconfortáveis para o paciente. O modelo de *Deep-Learning* [SpectroVit](https://pubmed.ncbi.nlm.nih.gov/39069027/) foi proposto com o intuito de acelerar as aquisições, gerando espectros de alta qualidade a partir do espectrograma de uma quantidade limitada de transientes de GABA. O espectrograma é uma representação bidimensional que carrega informações temporais e frequenciais sobre o sinal de origem, e não é normalmente usado no contexto de MRS. O espectrograma é obtido através da Transformada de Fourier de Curto Tempo (STFT), a qual utiliza uma técnica de janelamento do sinal. Este estudo se propôs a investigar a representação por espectrograma de transientes de GABA, visando entender como tal representação se altera dependendo das escolhas de parâmetros da STFT (tamanho, passo e formato de janela e normalização da imagem) e da característica do sinal original (diferentes níveis de ruído). Também investigou-se como a variação do passo de janela afeta a performance do SpectroVit. Para a caracterização do espectrograma de GABA considera-se observações qualitativas apoiadas de métricas quantitativas. Este trabalho contribui para o entendimento dessa nova representação para transientes de GABA que é o objeto de entrada do SpectroVit, contribuindo assim para a explicabilidade do modelo e aceitação em meio clínico.
+Project Abstract: Gamma-Aminobutyric Acid (GABA) is the primary inhibitory neurotransmitter in the nervous system, and deficiencies in GABA levels are associated with psychiatric syndromes, such as depression. Due to its importance, there is an interest in quantifying GABA concentration in vivo. For this purpose, Magnetic Resonance Spectroscopy (MRS) is used, in which multiple GABA transients are acquired and their spectra analyzed. However, this technique requires lengthy acquisitions, which can be uncomfortable for patients. The Deep-Learning model [SpectroVit](https://pubmed.ncbi.nlm.nih.gov/39069027/) was proposed to speed up acquisitions, generating high-quality spectra from the spectrogram of a limited number of GABA transients. The spectrogram is a two-dimensional representation carrying both temporal and frequency information of the original signal and is not commonly used in the MRS context. It is obtained through the Short-Time Fourier Transform (STFT), which employs a windowing technique. This study investigates how the spectrogram representation of GABA transients changes depending on the STFT parameter choices (window size, step, shape, and image normalization) and the original signal characteristics (different noise levels). It also examines how varying the window step affects SpectroVit’s performance. Both qualitative observations and quantitative metrics support the characterization of the GABA spectrogram. This work contributes to understanding this new representation for GABA transients, which serves as the input for SpectroVit, thereby aiding the model's interpretability and clinical acceptance.
 
-## Contexto
+## Context
 
-Sinais de espectroscopia por ressonância magnétrica são adquiridos no domínio do tempo e analisados no domínio da frequência através da Transformada de Fourier (FT). Quando no domínio do tempo, refere-se a transientes ou sinais FID, no domínio da frequência refere-se a espectros. Uma outra representação possível para tais sinais é a representação pela Transformada de Fourier de Curto Tempo (STFT), a qual transforma o sinal em uma função de duas variáveis: o tempo e a frequência. Essa representação, no entanto, não é muito usual no contexto de espectroscopia para quantificação do neurotransmissor GABA. Apesar disso, seu uso foi proposto como objeto de entrada de um modelo de reconstrução de espectro de GABA - [SpectroVit](https://pubmed.ncbi.nlm.nih.gov/39069027/) - e os resultados positivos geraram interesse nesse tipo de representação. 
+Magnetic resonance spectroscopy signals are acquired in the time domain and analyzed in the frequency domain through the Fourier Transform (FT). In the time domain, they are referred to as transients or FID signals, while in the frequency domain, they are called spectra. Another possible representation is through the Short-Time Fourier Transform (STFT), which converts the signal into a function of two variables: time and frequency. Although not typically used in the context of neurotransmitter GABA quantification, its use was proposed as an input for the GABA spectrum reconstruction model [SpectroVit](https://pubmed.ncbi.nlm.nih.gov/39069027/), and the positive results have sparked interest in this representation.
 
-A STFT é interessante, pois ela carrega informações frequenciais e temporais de um sinal. Além disso, apesar de ser uma função no domínio dos números complexos, quando apenas uma componente é selecionada (parte real, parte imaginária, magnitude ou fase), pode-se visualizar a STFT como uma imagem que contém na direção horizontal o eixo do tempo, na direção vertical o eixo das frequências, e a intensidade dos pixels correspondendo a amplitude da componente da STFT para um par (instante,frequência). Ao tratar-se da STFT como uma imagem, pode-se utilizar das vastas ferramentas de tratamento de imagens (clássicas e baseadas em IA) para extrair informações da mesma.
+The STFT is valuable because it contains both frequency and temporal information. Despite being a function in the complex domain, selecting a single component (real part, imaginary part, magnitude, or phase) allows visualization as an image: the horizontal axis represents time, the vertical axis represents frequency, and pixel intensity corresponds to the STFT component amplitude at a given (time, frequency) pair. This enables the use of extensive image processing tools (both classical and AI-based) for analysis.
 
-A construção da STFT depende de uma janela que percorre o sinal no tempo e em cada posição realiza a FT do sinal englobado (Fig. 1). O passo, tamanho e formato da janela são parâmetros dessa função, e referidos neste trabalho como *hop*,*mfft* e *win*, respectivamente. Além disso, para a visualização da STFT a normalização da função (*norm*) e a componente visualizada (*p*) também são parâmetros importantes. Neste trabalho, visto o interesse na utilização da STFT para representar sinais FID de GABA, busca-se caracterizar como a variação dos parâmetros da STFT afetam a imagem visualizada. Além disso, busca-se caracterizar como propriedades do sinal, como o nível de ruído, se manifestam no domínio da STFT.
+The STFT construction depends on a window moving over the signal in time, performing the FT at each position (Fig. 1). The parameters include the step (*hop*), window size (*mfft*), and window shape (*win*). For visualization, normalization (*norm*) and the selected component (*p*) are also essential. This work focuses on how varying these parameters affects the visualized STFT image and how signal properties, such as noise levels, manifest in the STFT domain.
 
-![Descrição parâmetros de construção da STFT e parâmetros de visualização STFT.](figures/imagem_stft.jpg)
+![Description of STFT construction and visualization parameters.](figures/imagem_stft.jpg)
 
-Figura 1: Descrição dos parâmetros de construção e de visualização da STFT.
+Figure 1: Description of STFT construction and visualization parameters.
 
-Nos documentos deste repositório encontra-se a caracterização da STFT com relação ao nível de ruído dos transientes, e da variação do *hop*, *mfft* e, conjuntamente, de *win* e *norm*. Para tal, utilizou-se transientes GABA-editados simulados disponibilizados pelo desafio [Edited-MRS Reconstruction Challenge](https://sites.google.com/view/edited-mrs-rec-challenge/home). 
+The documents in this repository contain the characterization of the STFT regarding the noise level of transients, as well as the variation of *hop*, *mfft*, and jointly, *win* and *norm*. For this purpose, simulated GABA-edited transients provided by the [Edited-MRS Reconstruction Challenge](https://sites.google.com/view/edited-mrs-rec-challenge/home) were used.
 
-Um estudo adicional deste trabalho refere-se a caracterização da performance do [SpectroVit](https://pubmed.ncbi.nlm.nih.gov/39069027/) em função da variação do *hop*. O repositório associado a esse estudo encontra-se disponível [aqui](https://github.com/lets-diniz/IC_SpectroVit).
+An additional study in this work focuses on characterizing the performance of [SpectroVit](https://pubmed.ncbi.nlm.nih.gov/39069027/) as a function of hop variation. The repository associated with this study is available [here](https://github.com/lets-diniz/IC_SpectroVit).
 
-Ao leitor interessado no contexto, dados e maiores explicações da metodologia do trabalho sugere-se leitura da publicação parcial do trabalho: [Resumo Apresentado no XXXII Congresso de Iniciação Científica da UNICAMP](https://prp.unicamp.br/inscricao-congresso/resumos/2024P23809A32091O2964.pdf)
+Readers interested in the context, data, and further explanations of the work’s methodology are encouraged to read the partial publication of this work: [Abstract Presented at the XXXII UNICAMP Scientific Initiation Congress](https://prp.unicamp.br/inscricao-congresso/resumos/2024P23809A32091O2964.pdf).
 
-**Observação:** Normalmente, utiliza-se o termo "espectrograma" para referir-se a imagem obtida da visualização da magnitude da STFT em escala logarítmica. No entanto, por coerência com a terminologia utilizada na publicação do [SpectroVit](https://pubmed.ncbi.nlm.nih.gov/39069027/), neste repositório refere-se a "espectrograma" de modo mais amplo, usando o termo como o entendimento da STFT como uma imagem. Como, no geral, em espectroscopia utiliza-se apenas a parte real da FT para definir o que se chama de espectro, aqui o termo "espectrograma de GABA" refere-se a imagem obtida da visualização da parte real da STFT (*p* = parte real). No restante deste documento, assume-se a nomenclatura aqui apresentada.
+**Note:** The term "spectrogram" is typically used to refer to the image obtained from the visualization of the STFT magnitude on a logarithmic scale. However, for consistency with the terminology used in the [SpectroVit](https://pubmed.ncbi.nlm.nih.gov/39069027/) publication, this repository adopts a broader use of the term "spectrogram," understanding the STFT as an image. Since, in general, spectroscopy uses only the real part of the FT to define what is called a spectrum, the term "GABA spectrogram" here refers to the image obtained from the visualization of the real part of the STFT (*p* = real part). The nomenclature presented here is assumed throughout the remainder of this document.
 
-## Descrição do Repositório
+## Repository Description
 
-Este repositório contém cinco notebooks descrevendo os resultados obtidos na caracterização do espectrograma de GABA:
+This repository contains five notebooks detailing the results of the GABA spectrogram characterization:
 
-- [Noise Study](STFT_NoiseStudy.ipynb): Contém os resultados da caracterização do espectrograma com relação a adição de ruído de amplitude aos transientes. Neste, descreve-se como esse tipo de ruído se manifesta no domínio do espectrograma e propõe-se três métodos para estimar o nível de ruído nesse novo domínio. Dois dentre os três métodos envolvem o uso de uma projeção do espectrograma na frequência, projeções essas que possuem características interessantes e que permitem, além da estimação do ruído, a estimação da largura dos picos do espectrograma. Neste documento, encontra-se ainda gráficos mostrando a evolução de características estatísticas de diferentes regiões do espectrograma em função do nível de ruído adicionado aos transientes. Como características estatísticas, considera-se: média, mediana, desvio-padrão, skewness e kurtosis.
+- [Noise Study](STFT_NoiseStudy.ipynb): Presents the characterization results regarding amplitude noise addition to transients. It describes how this noise type manifests in the spectrogram domain and proposes three methods for estimating noise levels. Two methods involve projecting the spectrogram onto the frequency axis, which also enables peak width estimation. The notebook includes plots showing the evolution of statistical characteristics (mean, median, standard deviation, skewness, and kurtosis) across different spectrogram regions as noise increases.
 
-- [Hop Variation Results](STFT_HopVariation_Results_with_and_without_noise.ipynb): Contém os resultados da caracterização do espectrograma com relação a variação do *hop*. Neste, descreve-se como o *hop* afeta a resolução temporal da imagem e a aparência (listras) dos picos. Avalia-se ainda o impacto desse parâmetro na resolução frequencial dos picos menos intensos da imagem e dos picos mais importantes. Como estudo complementar, observa-se ainda como características estatísticas de diferentes regiões do espectrograma variam em função do *hop*. A Figura 2 apresenta um resumo dos principais efeitos do *hop*.
+- [Hop Variation Results](STFT_HopVariation_Results_with_and_without_noise.ipynb): Explores how varying the *hop* affects the temporal resolution and peak appearance (e.g., stripe patterns) in the spectrogram. It also assesses the impact on the frequency resolution of less intense and major peaks. Statistical variations in different spectrogram regions as a function of *hop* are analyzed. Figure 2 summarizes the main *hop* effects.
 
-- [Mfft Variation Results](STFT_MfftVariation_Results_with_and_without_noise.ipynb): Contém os resultados da caracterização do espectrograma com relação a variação da *mfft*. Neste, descreve-se como a *mfft* afeta a resolução frequencial da imagem, impactando a largura e comprimento dos picos. Avalia-se ainda se esse parâmetro afeta a aparência dos picos. A Figura 3 apresenta um resumo dos principais efeitos da *mfft*.
+- [Mfft Variation Results](STFT_MfftVariation_Results_with_and_without_noise.ipynb): Shows how changes in *mfft* affect the spectrogram’s frequency resolution, influencing peak width and length. It also investigates any visual effects on the peaks. Figure 3 highlights the primary effects of varying *mfft*.
 
+- [WinNorm Variation Results](STFT_MfftVariation_Results_with_and_without_noise.ipynb): Details how combinations of *win* and *norm* parameters impact peak width, length, and appearance. It also examines how these variations influence the image’s statistical properties.
 
-- [WinNorm Variation Results](STFT_MfftVariation_Results_with_and_without_noise.ipynb): Contém os resultados da caracterização do espectrograma com relação a variação de *win* e *norm*. Neste, descreve-se como a combinação de tais parâmetros afeta a largura, comprimento e aparência dos picos. Também investiga-se o efeito da variação de tais parâmetros em características estatísitcas da imagem.
+- [Hop Variation Considerations for Different Mfft](STFT_HopVariation_Considerations_for_different_mfft_data_without_noise.ipynb): A complementary notebook exploring whether the *hop* variation findings generalize across different *mfft* values.
 
+![Description of the main effects of hop variation.](figures/imagem_hop.jpg)
 
-- [Hop Variation Considerations for Different Mfft](STFT_HopVariation_Considerations_for_different_mfft_data_without_noise.ipynb): Notebook complementar. Neste notebook, busca-se compreender se os resultados obtidos no estudo individual do *hop* se gerneralizam para valores diferentes de *mfft*.
+Figure 2: Description of the main effects of *hop* variation.
 
+![Description of the main effects of mfft variation.](figures/imagem_mfft.jpg)
 
-![Descrição principais efeitos da variação do hop.](figures/imagem_hop.jpg)
+Figure 3: Description of the main effects of *mfft* variation.
 
-Figura 2: Descrição principais efeitos da variação do *hop*.
-
-![Descrição principais efeitos da variação da hop.](figures/imagem_mfft.jpg)
-
-Figura 3: Descrição principais efeitos da variação da *mfft*.
-
-Os resultados apresentados nos notebooks mencionados acima são qualitativos e quantitativos. Para a geração dos resultados quantitativos, três scripts são utilizados:
+The results presented in the notebooks mentioned above are both qualitative and quantitative. To generate the quantitative results, three scripts are used:
 
 - [Hop Study](generate_quantitative_dataset_hop_study.py)
 
@@ -61,9 +58,9 @@ Os resultados apresentados nos notebooks mencionados acima são qualitativos e q
 
 - [WinNorm Study](generate_quantitative_dataset_winnorm_study.py)
 
-A forma de utilização de tais scripts está descrita na Seção [Como gerar resultados quantitativos](#como-gerar-resultados-quantitativos).
+The usage of these scripts is described in the section [How to generate quantitative results](#how-to-generate-quantitative-results).
 
-Além desses, os scripts 
+In addition to these, the scripts
 
 - [Functions for Noise Study](functions_for_noise_study.py)
 
@@ -73,54 +70,54 @@ Além desses, os scripts
 
 - [Data corruption](data_corruption.py)
 
-contém funções auxiliares utilizadas na geração e análise de resultados quantitativos e qualitativos.
+contain auxiliary functions used in the generation and analysis of quantitative and qualitative results.
 
-Finalmente, pastas adicionais contém notebooks originais para a geração de resultados quantitativos e a abordagem inicial realizada para o estudo do ruído, a qual foi substituída pela abordagem presente em [Noise Study](STFT_NoiseStudy.ipynb) por essa parecer mais pertinente para a caracterização do espectrograma.
+Finally, additional folders contain the original notebooks for generating quantitative results and the initial approach taken for the noise study, which was later replaced by the approach presented in [Noise Study](STFT_NoiseStudy.ipynb) as it seemed more appropriate for spectrogram characterization.
 
-## Como gerar resultados quantitativos
+## How to generate quantitative results
 
-Para utilização dos scripts de geração de dados quantitativos, é preciso executar o script, por exemplo:
+To use the scripts for generating quantitative data, you need to run the script, for example:
 
 ```yaml
 python generate_quantitative_dataset_hop_study.py
 ```
-No início da execução, será requisitado ao usuário de indicar o caminho para um arquivo YAML contendo as informações que definem o estudo a ser realizado.
+At the beginning of the execution, the user will be prompted to provide the path to a YAML file containing the information that defines the study to be conducted.
 
-Informações gerais:
+General information:
 
 ```yaml
 fids:
-  qntty: int #quantidade de transients a considerar. Default: 100
-  path_to_gt_fids: "caminho para arquivo h5 contendo os transientes" #deve conter datasets: "ground_truth_fids", "ppm" e "t" contendo transientes de tamanho (2048,2), arrays de ppm e tempo de tamanho (2048), respectivamente
+  qntty: int # number of transients to consider. Default: 100
+  path_to_gt_fids: "path to the h5 file containing the transients" # should contain datasets: "ground_truth_fids", "ppm", and "t", with transients of size (2048,2), arrays of ppm and time of size (2048), respectively
 
-name_of_study: "string com o nome da pasta a ser criada para salvar os arquivos resultantes" #default: hop_study
+name_of_study: "string with the name of the folder to be created to save the resulting files" # default: hop_study
 
 amplitude_noise:
-  add_noise: True/False #se True adiciona ruído aos transientes
+  add_noise: True/False # if True, noise is added to the transients
   noise_config:
-    std_base: float #valor base para variância da distribuição normal que configura o ruído
-    std_var: float #variação possível máxima para variância da distribuição normal com relação ao valor de base
-    nmb_of_transients_to_combine: int #quantidade de transientes ruídosos a serem criados a partir de um transiente original. Default: 160
+    std_base: float # base value for the variance of the normal distribution that configures the noise
+    std_var: float # maximum possible variation for the variance of the normal distribution relative to the base value
+    nmb_of_transients_to_combine: int # number of noisy transients to be created from an original transient. Default: 160
 
-save_pictures_along_the_way: True/False #se True, produz imagens da análise durante a execução do script
+save_pictures_along_the_way: True/False # if True, produces images of the analysis during script execution
 ```
-Informações particulares a cada tipo de estudo, para a variação do *hop*, por exemplo:
+
+Specific information for each type of study, for example, regarding the variation of *hop*:
 
 ```yaml
 study_parameters:
-  param_to_vary: 'hop'
+  param_to_vary: 'hop' # The parameter that will be varied in the study.
   variation_details:
-      min: int #valor mínimo do hop
-      max: int #valor máximo do hop
-      step: int #passo entre valores de hop
+      min: int # Minimum value for the hop
+      max: int # Maximum value for the hop
+      step: int # Step between hop values
   fixed_params:
-      'mfft': int #valor da mfft a ser usado. Default: 512
-      'win': string 'hann', 'rect' ou 'flat' #tipo de janela. Default: 'hann'. Caso outras opções sejam desejadas é preciso alterar o script.
-      'norm': string 'abs', 'm1p1', 'minmax' ou 'zscore' #tipo de norma. Default: 'abs'. Caso outras opções sejam desejadas é preciso alterar o script.
+      'mfft': int # mfft value to be used. Default: 512
+      'win': string # 'hann', 'rect', or 'flat'. Default: 'hann'. If other options are desired, the script must be modified.
+      'norm': string # 'abs', 'm1p1', 'minmax', or 'zscore'. Default: 'abs'. If other options are desired, the script must be modified.
 ```
 
-Para o caso do estudo da variação de winnorm, a key 'variation_details' deve conter as keys 'win' e 'norm', cada uma contendo uma lista de tipos de janelas e normas a serem utilizadas. Por exemplo:
-
+For the winnorm study, the key 'variation_details' should contain two lists: one for the window types (win) and one for the normalization types (norm). Example:
 
 ```yaml
 study_parameters:
@@ -140,21 +137,21 @@ study_parameters:
       'mfft': 512
 ```
 
-Também é possível realizar uma análise estatística com relação a variação dos parâmetros. Para tal é necessário indicar valores absolutos que constituem limites para a seleção de trechos da imagem:
+It is also possible to perform a statistical analysis regarding the variation of the parameters. For this, it is necessary to indicate absolute values that constitute limits for the selection of sections of the image:
 
 ```yaml
 stats_analysis:
-  perform_stats_analysis: True/False #se False, análise estatística não é realizada
-  segmentation_values: lista de floats #lista com os limites considerados
-  save_pictures: True/False #se True, salva imagens da análise durante execução do script
+  perform_stats_analysis: True/False # If False, the statistical analysis is not performed
+  segmentation_values: list of floats # List of the considered limits
+  save_pictures: True/False # If True, saves images of the analysis during script execution
 ```
 
-Para maiores esclarecimentos, sugere-se a leitura do notebook: [Hop Variation Results](STFT_HopVariation_Results_with_and_without_noise.ipynb).
+For further clarification, it is suggested to read the notebook: [Hop Variation Results](STFT_HopVariation_Results_with_and_without_noise.ipynb).
 
-Exemplos de arquivos YAML e de datasets quantitativos estão disponibilizados neste repositório. 
+Examples of YAML files and quantitative datasets are available in this repository.
 
-## Créditos
+## Credits
 
-- Esse estudo utilizou dados obtidos do desafio [Edited-MRS Reconstruction Challenge](https://sites.google.com/view/edited-mrs-rec-challenge/home). 
+- This study used data obtained from the [Edited-MRS Reconstruction Challenge](https://sites.google.com/view/edited-mrs-rec-challenge/home). 
 
-- O script de Data Augmentation foi adaptado do repositório do desafio [Edited-MRS Reconstruction Challenge](https://github.com/rmsouza01/Edited-MRS-challenge).
+- The Data Augmentation script was adapted from the [Edited-MRS Reconstruction Challenge repository](https://github.com/rmsouza01/Edited-MRS-challenge).
